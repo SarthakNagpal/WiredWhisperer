@@ -11,7 +11,7 @@ import sweetviz as sv
 data = pd.DataFrame()
 
 # Sidebar
-st.sidebar.title("Data Cleaner App - 'Wired Whisperer")
+st.sidebar.title("Data Cleaner App - 'Wired Whisperer'")
 st.sidebar.image('https://drive.google.com/uc?export=view&id=1MfJeiu8IDE_D1_jYzGCSwPPot8lcuVv2', use_column_width=True)
 st.sidebar.markdown(
     """
@@ -23,19 +23,27 @@ st.sidebar.markdown(
     machine learning, and data analysis. Currently seeking opportunities to apply my
     skills and contribute to real-world projects.
 
-    [GitHub]www.Github.com/SarthakNagpal
+    [GitHub](www.Github.com/SarthakNagpal)
     """
 )
-
-# Step 1: Upload dataset
-st.title("Data Preprocessing App")
-
-uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
 
 # Function to generate Sweetviz report
 @st.cache(allow_output_mutation=True)
 def generate_eda_report(data):
-    return sv.analyze(data)
+    report = sv.analyze(data)
+    return report
+
+# Function to display Sweetviz report in a separate HTML popup
+def display_sweetviz_report(report):
+    st.subheader("Exploratory Data Analysis (EDA)")
+    st.write("Performing EDA...")
+
+    # Save the report to a temporary HTML file
+    report_file_path = "eda_report.html"
+    report.show_html(report_file_path, open_browser=False)
+
+    # Display a link to open the report in a new tab
+    st.markdown(f'<a href="file:///{report_file_path}" target="_blank">Open Sweetviz Report</a>', unsafe_allow_html=True)
 
 # Function to handle file upload and EDA report generation
 def handle_uploaded_file(file):
@@ -45,21 +53,17 @@ def handle_uploaded_file(file):
     st.subheader("DataFrame uploaded:")
     st.write(data)
 
-    # Button to generate EDA report
+    # Button to generate and display EDA report
     if st.button("Generate EDA Report"):
-        st.subheader("Exploratory Data Analysis (EDA)")
-        st.write("Performing EDA...")
         eda_report = generate_eda_report(data)
-        st.write(eda_report.show_notebook())
-
-        # Download EDA Report
-        download_eda_btn = st.button("Download EDA Report")
-        if download_eda_btn:
-            st.write("Downloading EDA Report...")
-            eda_report.show_html("eda_report.html")
-            st.success("Download completed!")
+        display_sweetviz_report(eda_report)
 
 # Main app logic
+st.title("Data Preprocessing App")
+
+uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
+
+# Handle file upload and EDA report generation
 if uploaded_file is not None:
     handle_uploaded_file(uploaded_file)
 
